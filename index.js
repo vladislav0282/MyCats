@@ -144,7 +144,6 @@ const openModalHandler = (e) => {
      * обработчика событий в отдельную функцию не нужно
      */
     $createCatForm.addEventListener('submit', (submitEvent) => {
-      console.log(submitEvent);
       submitEvent.preventDefault()
 
       const formDataObject = formatCreateFormData(
@@ -203,9 +202,7 @@ $wr.addEventListener('click', (e) => {
     const $catWr = e.target.closest('[data-cat-id]')
     
     const catId = $catWr.dataset.catId
-    // console.log(catId);
-    // console.log($catEdit);
-    // $modalWr.classList.remove('hidden')
+
     $catEdit.classList.remove('hidden')
     
    let formEditData = Object.fromEntries(new FormData($formEditData).entries())
@@ -281,6 +278,7 @@ let formDeteilData = Object.fromEntries(new FormData($formDeteil).entries())
  
 
   let formDeteilDataValues = Object.values(formDeteilData)
+  
 
   $formDeteil.querySelectorAll('input')[0].value = formDeteilDataValues[0]
   $formDeteil.querySelectorAll('input')[1].value = formDeteilDataValues[1]
@@ -308,46 +306,79 @@ let formDeteilData = Object.fromEntries(new FormData($formDeteil).entries())
         $catDeteil.classList.remove('hidden')
         $catDeteil.classList.add('hidden')
       }
-  })
+    })
+    
 
-// Редактирование карточки
   $catDeteil.addEventListener('submit', (submitEvent) => {
-    
-    
-    console.log(submitEvent);
     submitEvent.preventDefault()
+    
+   const catEdit = submitEvent.target.closest('[data-formDeteil]')
 
-    let formCreateEditData = Object.fromEntries(new FormData($formDeteil).entries())
-  
-    formCreateEditData = {
-      ...formCreateEditData,
-      id: +formCreateEditData.id,
-      rate: +formCreateEditData.rate,
-      age: +formCreateEditData.age,
-      favorite: !!formCreateEditData.favorite,
+   let formEditData = Object.fromEntries(new FormData(catEdit).entries())
+
+formEditData = {
+      ...formEditData,
+      id: +formEditData.id,
+      rate: +formEditData.rate,
+      age: +formEditData.age,
+      favorite: !!formEditData.favorite,
     }
 
-      fetch('https://cats.petiteweb.dev/api/single/vladislav0282/add/', {
-        method: 'POST',
+   let formEditDataId = Object.values(formEditData)
+   
+let catid = formEditDataId[0]
+
+
+
+fetch(`https://cats.petiteweb.dev/api/single/vladislav0282/update/${catid}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formCreateEditData),
+        body: JSON.stringify(formEditData),
       }).then((res) => {
         if (res.status === 200) {
           $catDeteil.classList.add('hidden')
-          $catDeteil.removeEventListener('click', clickModalWrHandler)
+          $modalWr.removeEventListener('click', clickModalWrHandler)
           $modalContent.innerHTML = ''
-       
+
+         
           localStorage.removeItem(CREATE_FORM_LS_KEY)
           return $wr.insertAdjacentHTML(
             'afterbegin',
-            getCatHTML(formCreateEditData),
+            getCatHTML(formEditData),
           )
         }
         throw Error('Ошибка при создании кота')
       }).catch(alert)
+      
+
+
+
     })
+  
+
+
+
+
+
+
+  
+
+
+
+
+          
     
+
   
-  
+    
+
+
+
+    
+     
+     
+
+
+    
